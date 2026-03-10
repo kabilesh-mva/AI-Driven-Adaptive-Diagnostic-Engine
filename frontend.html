@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Driven Adaptive Diagnostic Engine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 800px;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .active-screen {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .question-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .question-text {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .options-container {
+            display: grid;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #e1e5e9;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .option-btn:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .option-btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .progress-bar {
+            background: #e1e5e9;
+            height: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .status {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .results-section {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .ability-score {
+            font-size: 2em;
+            color: #667eea;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .study-plan {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .study-plan h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .study-plan-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 Adaptive Diagnostic Engine</h1>
+            <p>Personalized assessment that adapts to your skill level</p>
+        </div>
+
+        <div class="content">
+            <!-- Welcome Screen -->
+            <div id="welcomeScreen" class="screen active-screen">
+                <h2>Welcome to the Adaptive Assessment!</h2>
+                <p style="margin: 20px 0; line-height: 1.6;">
+                    This intelligent system will adapt question difficulty based on your performance. 
+                    Answer questions to receive personalized feedback and study recommendations.
+                </p>
+                
+                <div class="form-group">
+                    <label for="userId">Enter Your Name/ID:</label>
+                    <input type="text" id="userId" placeholder="e.g., John Doe or Student123">
+                </div>
+                
+                <button id="startBtn" class="btn">Start Assessment</button>
+            </div>
+
+            <!-- Loading Screen -->
+            <div id="loadingScreen" class="screen">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <h3>Loading your personalized assessment...</h3>
+                    <p>Please wait while we prepare your questions</p>
+                </div>
+            </div>
+
+            <!-- Question Screen -->
+            <div id="questionScreen" class="screen">
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+                </div>
+                
+                <div id="statusMessage" class="status hidden"></div>
+                
+                <div id="questionCard" class="question-card">
+                    <div id="questionText" class="question-text">Loading question...</div>
+                    <div id="optionsContainer" class="options-container">
+                        <!-- Options will be populated dynamically -->
+                    </div>
+                </div>
+                
+                <button id="submitAnswerBtn" class="btn" disabled>Submit Answer</button>
+            </div>
+
+            <!-- Results Screen -->
+            <div id="resultsScreen" class="screen">
+                <div class="results-section">
+                    <h2>🎉 Assessment Complete!</h2>
+                    <p>Your personalized results and study plan are ready.</p>
+                    
+                    <div class="ability-score">
+                        Final Ability Score: <span id="finalAbility">0.00</span>
+                    </div>
+                    
+                    <div class="study-plan">
+                        <h3>🎯 Personalized Study Plan</h3>
+                        <div id="studyPlanItems">
+                            <!-- Study plan items will be populated dynamically -->
+                        </div>
+                    </div>
+                    
+                    <button id="restartBtn" class="btn">Take Another Assessment</button>
+                </div>
+            </div>
+
+            <!-- Error Screen -->
+            <div id="errorScreen" class="screen">
+                <div class="results-section">
+                    <h2>❌ Something went wrong</h2>
+                    <p id="errorMessage">An error occurred during the assessment.</p>
+                    <button id="retryBtn" class="btn">Try Again</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE_URL = 'http://127.0.0.1:8000'; // Update this if your backend runs elsewhere
+
+        // Global state
+        let currentSessionId = null;
+        let currentQuestion = null;
+        let selectedOption = null;
+        let questionsAnswered = 0;
+        let totalQuestions = 10;
+
+        // DOM Elements
+        const screens = {
+            welcome: document.getElementById('welcomeScreen'),
+            loading: document.getElementById('loadingScreen'),
+            question: document.getElementById('questionScreen'),
+            results: document.getElementById('resultsScreen'),
+            error: document.getElementById('errorScreen')
+        };
+
+        // Button elements
+        const startBtn = document.getElementById('startBtn');
+        const submitAnswerBtn = document.getElementById('submitAnswerBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const retryBtn = document.getElementById('retryBtn');
+
+        // Event Listeners
+        startBtn.addEventListener('click', startAssessment);
+        submitAnswerBtn.addEventListener('click', submitAnswer);
+        restartBtn.addEventListener('click', () => {
+            resetApp();
+            showScreen('welcome');
+        });
+        retryBtn.addEventListener('click', () => {
+            resetApp();
+            showScreen('welcome');
+        });
+
+        // Utility Functions
+        function showScreen(screenName) {
+            Object.keys(screens).forEach(key => {
+                screens[key].classList.remove('active-screen');
+            });
+            screens[screenName].classList.add('active-screen');
+        }
+
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            showScreen('error');
+        }
+
+        function showStatus(message, type = 'success') {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+            statusEl.classList.remove('hidden');
+            
+            setTimeout(() => {
+                statusEl.classList.add('hidden');
+            }, 3000);
+        }
+
+        function updateProgress() {
+            const progressPercent = (questionsAnswered / totalQuestions) * 100;
+            document.getElementById('progressFill').style.width = `${progressPercent}%`;
+        }
+
+        function resetApp() {
+            currentSessionId = null;
+            currentQuestion = null;
+            selectedOption = null;
+            questionsAnswered = 0;
+            document.getElementById('userId').value = '';
+        }
+
+        // API Functions
+        async function startAssessment() {
+            const userId = document.getElementById('userId').value.trim();
+            if (!userId) {
+                showStatus('Please enter your name/ID', 'error');
+                return;
+            }
+
+            showScreen('loading');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/start-session/${encodeURIComponent(userId)}`, {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to start session: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                currentSessionId = data.session_id;
+                
+                showStatus('Session started successfully!');
+                loadNextQuestion();
+            } catch (error) {
+                console.error('Error starting assessment:', error);
+                showError(`Failed to start assessment: ${error.message}`);
+            }
+        }
+
+        async function loadNextQuestion() {
+            try {
+                console.log('Loading next question for session:', currentSessionId);
+                const response = await fetch(`${API_BASE_URL}/next-question/${currentSessionId}`);
+
+                console.log('Question response status:', response.status);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Question error:', errorText);
+                    throw new Error(`Failed to get question: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('Question data:', data);
+                currentQuestion = data;
+
+                // Update UI with question
+                document.getElementById('questionText').textContent = data.text;
+
+                const optionsContainer = document.getElementById('optionsContainer');
+                optionsContainer.innerHTML = '';
+
+                data.options.forEach((option, index) => {
+                    const button = document.createElement('button');
+                    button.className = 'option-btn';
+                    button.textContent = `${String.fromCharCode(65 + index)}. ${option}`;
+                    button.onclick = () => selectOption(option, button);
+                    optionsContainer.appendChild(button);
+                });
+
+                // Reset selections
+                selectedOption = null;
+                submitAnswerBtn.disabled = true;
+
+                updateProgress();
+                showScreen('question');
+            } catch (error) {
+                console.error('Error loading question:', error);
+                showError(`Failed to load question: ${error.message}`);
+            }
+        }
+
+        function selectOption(option, buttonElement) {
+            // Remove selection from all buttons
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Select the clicked button
+            buttonElement.classList.add('selected');
+            selectedOption = option;
+            submitAnswerBtn.disabled = false;
+        }
+
+        async function submitAnswer() {
+            if (!selectedOption) {
+                showStatus('Please select an answer', 'error');
+                return;
+            }
+
+            submitAnswerBtn.disabled = true;
+
+            try {
+                console.log('Submitting answer:', {
+                    session_id: currentSessionId,
+                    question_id: currentQuestion.question_id,
+                    selected_answer: selectedOption
+                });
+
+                const response = await fetch(`${API_BASE_URL}/submit-answer`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        session_id: currentSessionId,
+                        question_id: currentQuestion.question_id,
+                        selected_answer: selectedOption
+                    })
+                });
+
+                console.log('Response status:', response.status);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Submit error:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                const data = await response.json();
+                console.log('Submit response:', data);
+
+                // Update progress
+                questionsAnswered++;
+
+                if (data.test_completed) {
+                    showStatus('Assessment completed! Generating your results...', 'success');
+                    setTimeout(() => {
+                        generateStudyPlan();
+                    }, 1500);
+                } else {
+                    showStatus(data.is_correct ? 'Correct! Moving to next question...' : 'Incorrect, but keep going!', 'success');
+                    setTimeout(() => {
+                        loadNextQuestion();
+                    }, 1500);
+                }
+            } catch (error) {
+                console.error('Error submitting answer:', error);
+                showError(`Failed to submit answer: ${error.message}`);
+            }
+        }
+
+        async function generateStudyPlan() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/generate-study-plan/${currentSessionId}`, {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to generate study plan: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                
+                // Display results
+                document.getElementById('finalAbility').textContent = data.performance_analysis.final_ability_score.toFixed(2);
+                
+                const studyPlanContainer = document.getElementById('studyPlanItems');
+                studyPlanContainer.innerHTML = '';
+                
+                data.study_plan.forEach((step, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'study-plan-item';
+                    item.innerHTML = `<strong>Step ${index + 1}:</strong> ${step}`;
+                    studyPlanContainer.appendChild(item);
+                });
+
+                showScreen('results');
+            } catch (error) {
+                console.error('Error generating study plan:', error);
+                showError(`Failed to generate study plan: ${error.message}`);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Adaptive Diagnostic Engine Frontend loaded');
+        });
+    </script>
+</body>
+</html>
